@@ -20,7 +20,27 @@ function FinderPattern({ x, y }) {
   );
 }
 
-export default function QRCode({ seed = "qr", size = 124 }) {
+export default function QRCode({ seed = "qr", value, size = 124 }) {
+  // When a real payload is supplied, render an actual scannable QR code
+  // (generated as an image) so a camera can decode it and deep-link into the
+  // matching form. Without `value` we fall back to the decorative grid below.
+  if (value) {
+    const px = Math.round(size * 3);
+    const src = `https://api.qrserver.com/v1/create-qr-code/?size=${px}x${px}&margin=0&data=${encodeURIComponent(
+      value
+    )}`;
+    return (
+      <img
+        className="qr-img"
+        src={src}
+        width={size}
+        height={size}
+        alt="Scannable QR code"
+        loading="lazy"
+      />
+    );
+  }
+
   const modules = 25;
   let state = hash(seed);
   const rand = () => {

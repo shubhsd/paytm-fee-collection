@@ -37,8 +37,12 @@ npm run dev      # http://localhost:5173
 npm run build    # production build
 ```
 
-Tip: open browser dev tools in mobile/device mode — the UI is mobile-first and
-shows a phone frame on wider screens.
+The UI is a mobile-first responsive web app — it renders as a centered app
+column on wider screens and scrolls as a normal web page.
+
+## Live demo
+
+https://paytm-fee-collection.vercel.app
 
 ## Stack
 
