@@ -1,25 +1,27 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { usePayment, formatINR } from "../context/PaymentContext";
+import { useVersion } from "../hooks/useVersion";
 import { BrowserBar, SecureFooter } from "../components/Chrome";
 import { CheckCircleIcon, CrossCircleIcon } from "../components/icons";
 
 export default function Result() {
-  const { order, result, setResult, setOrder } = usePayment();
-  const navigate = useNavigate();
+  const { order, result, setResult, setOrder, clearDrafts } = usePayment();
+  const { go, base } = useVersion();
 
-  if (!result) return <Navigate to="/" replace />;
+  if (!result) return <Navigate to={base} replace />;
 
   const ok = result.success;
 
   function done() {
     setResult(null);
     setOrder(null);
-    navigate("/", { replace: true });
+    clearDrafts();
+    go("/", { replace: true });
   }
 
   function retry() {
     setResult(null);
-    navigate("/checkout", { replace: true });
+    go("/checkout", { replace: true });
   }
 
   return (

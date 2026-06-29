@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
-import { usePayment, formatINR } from "../context/PaymentContext";
-import { useVersion } from "../hooks/useVersion";
-import { BrowserBar, SecureFooter } from "../components/Chrome";
-import { ChevronLeft } from "../components/icons";
-import { METHODS, UPI_APPS, BANKS, methodValid } from "../data/payment";
+import { usePayment, formatINR } from "../../context/PaymentContext";
+import { useVersion } from "../../hooks/useVersion";
+import { METHODS, UPI_APPS, BANKS, methodValid } from "../../data/payment";
 
 export default function Checkout() {
   const { order } = usePayment();
@@ -17,23 +15,16 @@ export default function Checkout() {
   const set = (k, v) => setPay((p) => ({ ...p, [k]: v }));
   const isValid = methodValid(method, pay);
 
-  function handlePay() {
-    go("/processing", { state: { method } });
-  }
-
   return (
-    <div className="page">
-      <BrowserBar />
-      <div className="scroll-area">
-        <div className="checkout-head">
-          <button className="back" onClick={() => go(-1)}>
-            <ChevronLeft style={{ width: 18, height: 18 }} /> Back
-          </button>
-          <div className="ch-amount">{formatINR(order.amount)}</div>
-          <div className="ch-to">Paying to {order.merchantName}</div>
-        </div>
+    <main className="web-main">
+      <button className="web-back" onClick={() => go(-1)}>
+        ← Back
+      </button>
+      <h1 className="web-title">Complete your payment</h1>
+      <p className="web-subtitle">Paying to {order.merchantName}</p>
 
-        <div className="pad" style={{ paddingTop: 8 }}>
+      <div className="web-grid">
+        <div className="web-card">
           <p className="pay-section-label">Choose payment method</p>
           <div className="method-list">
             {METHODS.map((m) => (
@@ -66,11 +57,7 @@ export default function Checkout() {
                                   set("upiApp", pay.upiApp === app.id ? "" : app.id)
                                 }
                               >
-                                <img
-                                  className="upi-app-logo"
-                                  src={app.logo}
-                                  alt={app.name}
-                                />
+                                <img className="upi-app-logo" src={app.logo} alt={app.name} />
                                 {app.name}
                               </button>
                             ))}
@@ -143,58 +130,55 @@ export default function Checkout() {
                     {m.id === "netbanking" && (
                       <div className="input-row">
                         <label>Select Bank</label>
-                        <select
-                          className="input-row"
-                          style={{
-                            width: "100%",
-                            padding: "13px 14px",
-                            borderRadius: 10,
-                            border: "1px solid var(--line-strong)",
-                            fontSize: 15,
-                            fontWeight: 600,
-                            background: "#fff",
-                          }}
-                          value={pay.bank || ""}
-                          onChange={(e) => set("bank", e.target.value)}
-                        >
-                          <option value="">Choose your bank</option>
-                          {BANKS.map((b) => (
-                            <option key={b}>{b}</option>
-                          ))}
-                        </select>
+                        <div className="field-box select-box" style={{ minHeight: 48 }}>
+                          <select
+                            className={pay.bank ? "" : "placeholder"}
+                            value={pay.bank || ""}
+                            onChange={(e) => set("bank", e.target.value)}
+                          >
+                            <option value="" disabled>
+                              Choose your bank
+                            </option>
+                            {BANKS.map((b) => (
+                              <option key={b}>{b}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     )}
-
                   </div>
                 )}
               </div>
             ))}
           </div>
+        </div>
 
-          <div className="order-summary">
-            <div className="os-row">
-              <span>Amount</span>
-              <span>{formatINR(order.amount)}</span>
+        <aside className="web-aside">
+          <div className="web-card web-summary">
+            <h3 className="web-summary-title">Order summary</h3>
+            <div className="web-summary-row">
+              <span>Paying to</span>
+              <span>{order.merchantName}</span>
             </div>
-            <div className="os-row">
+            <div className="web-summary-row">
               <span>Convenience fee</span>
               <span>₹0.00</span>
             </div>
-            <div className="os-row total">
+            <div className="web-summary-row total">
               <span>Total payable</span>
               <span>{formatINR(order.amount)}</span>
             </div>
+            <button
+              className="btn btn-dark"
+              disabled={!isValid}
+              onClick={() => go("/processing", { state: { method } })}
+            >
+              Pay {formatINR(order.amount)}
+            </button>
+            <p className="web-secure">🔒 100% Secure Government Payments</p>
           </div>
-        </div>
-
-        <SecureFooter />
+        </aside>
       </div>
-
-      <div className="sticky-cta">
-        <button className="btn btn-dark" disabled={!isValid} onClick={handlePay}>
-          Pay {formatINR(order.amount)}
-        </button>
-      </div>
-    </div>
+    </main>
   );
 }

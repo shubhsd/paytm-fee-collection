@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 const PaymentContext = createContext(null);
 
@@ -7,9 +7,18 @@ export function PaymentProvider({ children }) {
   const [order, setOrder] = useState(null);
   // Result of the dummy payment attempt.
   const [result, setResult] = useState(null);
+  // Saved form inputs, so pressing back from a later page restores them.
+  const [drafts, setDrafts] = useState({});
+
+  const saveDraft = useCallback((key, data) => {
+    setDrafts((d) => ({ ...d, [key]: data }));
+  }, []);
+  const clearDrafts = useCallback(() => setDrafts({}), []);
 
   return (
-    <PaymentContext.Provider value={{ order, setOrder, result, setResult }}>
+    <PaymentContext.Provider
+      value={{ order, setOrder, result, setResult, drafts, saveDraft, clearDrafts }}
+    >
       {children}
     </PaymentContext.Provider>
   );

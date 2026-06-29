@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { usePayment, formatINR } from "../context/PaymentContext";
-import { useVersion } from "../hooks/useVersion";
-import { BrowserBar } from "../components/Chrome";
+import { usePayment, formatINR } from "../../context/PaymentContext";
+import { useVersion } from "../../hooks/useVersion";
 
 const STEPS = [
   "Connecting to your bank…",
@@ -22,7 +21,6 @@ export default function Processing() {
     timers.current.push(setTimeout(() => setStep(2), 2200));
     timers.current.push(
       setTimeout(() => {
-        // Dummy outcome: succeed ~90% of the time.
         const success = Math.random() < 0.9;
         const txnId =
           "T" +
@@ -45,18 +43,15 @@ export default function Processing() {
   if (!order) return <Navigate to={base} replace />;
 
   return (
-    <div className="page">
-      <BrowserBar />
-      <div className="scroll-area">
-        <div className="center-state">
-          <div className="spinner" />
-          <div className="state-title">{formatINR(order.amount)}</div>
-          <div className="state-sub">{STEPS[step]}</div>
-          <div className="dont-close">
-            Please do not press back or close this window
-          </div>
+    <main className="web-main web-main-narrow">
+      <div className="web-card center-state">
+        <div className="spinner" />
+        <div className="state-title">{formatINR(order.amount)}</div>
+        <div className="state-sub">{STEPS[step]}</div>
+        <div className="dont-close">
+          Please do not press back or close this window
         </div>
       </div>
-    </div>
+    </main>
   );
 }
