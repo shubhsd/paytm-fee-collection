@@ -2,6 +2,7 @@ import { useState } from "react";
 import { usePayment, formatINR } from "../context/PaymentContext";
 import { useVersion } from "../hooks/useVersion";
 import { BrowserBar, PortalHeader, SecureFooter } from "../components/Chrome";
+import CostCalculator, { computeCost } from "../components/CostCalculator";
 import { ENTITIES } from "../data/departments";
 
 export default function EntitySelect() {
@@ -11,9 +12,9 @@ export default function EntitySelect() {
   const [amountStr, setAmountStr] = useState(() => drafts.entity?.amountStr || "");
   const [submitted, setSubmitted] = useState(false);
 
-  const amount = Number(amountStr || 0);
+  const cost = computeCost(amountStr);
   const entityValid = !!entity;
-  const amountValid = amount > 0;
+  const amountValid = cost.a > 0;
   const valid = entityValid && amountValid;
 
   function proceed() {
@@ -22,8 +23,12 @@ export default function EntitySelect() {
     saveDraft("entity", { entity, amountStr });
     setOrder({
       merchantName: entity,
-      amount,
-      details: [{ label: "Entity", value: entity }],
+      amount: cost.a,
+      details: [
+        { label: "Entity", value: entity },
+        { label: "1% of total cost (B)", value: formatINR(cost.cess) },
+        { label: "99% of B", value: formatINR(cost.payable) },
+      ],
     });
     go("/checkout");
   }
@@ -63,25 +68,11 @@ export default function EntitySelect() {
             )}
           </div>
 
-          <div className="field">
-            <div className="amount-inline">
-              <span className="amount-label">Amount*</span>
-              <span className="amount-entry">
-                <span className="rupee">₹</span>
-                <input
-                  inputMode="decimal"
-                  placeholder="Enter amount"
-                  value={amountStr}
-                  onChange={(e) =>
-                    setAmountStr(e.target.value.replace(/[^\d.]/g, ""))
-                  }
-                />
-              </span>
-            </div>
-            {submitted && !amountValid && (
-              <p className="field-error">Enter a valid amount</p>
-            )}
-          </div>
+          <CostCalculator
+            value={amountStr}
+            onChange={(e) => setAmountStr(e.target.value.replace(/[^\d.]/g, ""))}
+            error={submitted && !amountValid ? "Enter the project cost" : ""}
+          />
         </div>
 
         <SecureFooter />
@@ -89,7 +80,7 @@ export default function EntitySelect() {
 
       <div className="sticky-cta">
         <button className="btn" disabled={submitted && !valid} onClick={proceed}>
-          Proceed to Pay{amount > 0 ? ` ${formatINR(amount)}` : ""}
+          Proceed to Pay{cost.a > 0 ? ` ${formatINR(cost.a)}` : ""}
         </button>
       </div>
     </div>

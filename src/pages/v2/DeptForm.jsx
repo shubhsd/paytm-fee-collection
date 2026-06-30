@@ -2,7 +2,8 @@ import { useState } from "react";
 import { usePayment, formatINR } from "../../context/PaymentContext";
 import { useVersion } from "../../hooks/useVersion";
 import { ENTITIES } from "../../data/departments";
-import { TextField, SelectField, AmountField } from "./fields";
+import CostCalculator, { computeCost } from "../../components/CostCalculator";
+import { TextField, SelectField } from "./fields";
 
 export default function DeptForm() {
   const { go } = useVersion();
@@ -20,6 +21,7 @@ export default function DeptForm() {
   );
   const [submitted, setSubmitted] = useState(false);
   const set = (k, val) => setV((p) => ({ ...p, [k]: val }));
+  const cost = computeCost(v.amount);
 
   const errors = {
     name: !v.name.trim() ? "Please enter your name" : "",
@@ -27,10 +29,9 @@ export default function DeptForm() {
     mobile: !/^\d{10}$/.test(v.mobile) ? "Enter a valid 10-digit mobile number" : "",
     idno: !v.idno.trim() ? "Please enter your ID" : "",
     entity: !v.entity ? "Please select an entity" : "",
-    amount: !(Number(v.amount) > 0) ? "Enter a valid amount" : "",
+    amount: !(cost.a > 0) ? "Enter the project cost" : "",
   };
   const valid = Object.values(errors).every((e) => !e);
-  const amount = Number(v.amount || 0);
   const err = (k) => (submitted ? errors[k] : "");
 
   function proceed() {
@@ -39,12 +40,14 @@ export default function DeptForm() {
     saveDraft("dept", v);
     setOrder({
       merchantName: v.entity,
-      amount,
+      amount: cost.a,
       details: [
         { label: "Name", value: `${v.name} ${v.surname}`.trim() },
         { label: "Mobile", value: v.mobile },
         { label: "ID", value: v.idno },
         { label: "Entity", value: v.entity },
+        { label: "1% of total cost (B)", value: formatINR(cost.cess) },
+        { label: "99% of B", value: formatINR(cost.payable) },
       ],
     });
     go("/checkout");
@@ -95,7 +98,7 @@ export default function DeptForm() {
             error={err("entity")}
             options={ENTITIES}
           />
-          <AmountField
+          <CostCalculator
             value={v.amount}
             onChange={(e) => set("amount", e.target.value.replace(/[^\d.]/g, ""))}
             error={err("amount")}
@@ -110,19 +113,23 @@ export default function DeptForm() {
               <span>{v.entity || "—"}</span>
             </div>
             <div className="web-summary-row">
-              <span>Name</span>
-              <span>{`${v.name} ${v.surname}`.trim() || "—"}</span>
+              <span>1% of total cost (B)</span>
+              <span>{cost.a > 0 ? formatINR(cost.cess) : "—"}</span>
+            </div>
+            <div className="web-summary-row">
+              <span>99% of B</span>
+              <span>{cost.a > 0 ? formatINR(cost.payable) : "—"}</span>
             </div>
             <div className="web-summary-row total">
-              <span>Amount</span>
-              <span>{amount > 0 ? formatINR(amount) : "—"}</span>
+              <span>Total payable</span>
+              <span>{cost.a > 0 ? formatINR(cost.a) : "—"}</span>
             </div>
             <button
               className="btn"
               disabled={submitted && !valid}
               onClick={proceed}
             >
-              Proceed to Pay{amount > 0 ? ` ${formatINR(amount)}` : ""}
+              Proceed to Pay{cost.a > 0 ? ` ${formatINR(cost.a)}` : ""}
             </button>
           </div>
         </aside>

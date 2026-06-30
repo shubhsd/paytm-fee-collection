@@ -52,22 +52,3 @@ export function SelectField({ label, value, onChange, error, options, placeholde
   );
 }
 
-export function AmountField({ value, onChange, error }) {
-  return (
-    <div className="field">
-      <label className="web-label">Amount</label>
-      <div className={`field-box ${error ? "invalid" : ""}`}>
-        <span className="rupee" style={{ marginRight: 6 }}>
-          ₹
-        </span>
-        <input
-          inputMode="decimal"
-          placeholder="Enter amount"
-          value={value}
-          onChange={onChange}
-        />
-      </div>
-      {error && <p className="field-error">{error}</p>}
-    </div>
-  );
-}
