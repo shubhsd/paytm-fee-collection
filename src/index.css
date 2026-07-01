@@ -110,9 +110,6 @@ a {
 
 /* ---------- Browser chrome (mimics the Safari address bar) ---------- */
 .browser-bar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
   background: #f1f3f6;
   padding: 10px 14px;
   border-bottom: 1px solid #e1e5ec;
@@ -383,6 +380,9 @@ a {
 }
 /* ---------- Checkout ---------- */
 .checkout-head {
+  position: sticky;
+  top: 0;
+  z-index: 15;
   background: linear-gradient(165deg, #022a6e, #0147a0);
   color: #fff;
   padding: 18px 22px 22px;
@@ -715,7 +715,9 @@ a {
 
 /* ---------- Inner page branded header ---------- */
 .portal-hero {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 15;
   background: linear-gradient(165deg, #022a6e, #0147a0);
   color: #fff;
   padding: 20px 22px 22px;
@@ -937,12 +939,19 @@ a {
   max-width: 560px;
 }
 .web-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   color: var(--paytm-cyan-dark);
   font-weight: 700;
   font-size: 14px;
-  margin-bottom: 14px;
+  padding: 4px 0;
+  margin-bottom: 12px;
+}
+.web-back:hover {
+  color: var(--paytm-blue);
 }
 .web-title {
   font-size: 28px;

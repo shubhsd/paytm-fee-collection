@@ -160,10 +160,6 @@ export default function Checkout() {
               <span>Paying to</span>
               <span>{order.merchantName}</span>
             </div>
-            <div className="web-summary-row">
-              <span>Convenience fee</span>
-              <span>₹0.00</span>
-            </div>
             <div className="web-summary-row total">
               <span>Total payable</span>
               <span>{formatINR(order.amount)}</span>

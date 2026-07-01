@@ -23,11 +23,11 @@ export default function EntitySelect() {
     saveDraft("entity", { entity, amountStr });
     setOrder({
       merchantName: entity,
-      amount: cost.a,
+      amount: cost.payable,
       details: [
-        { label: "Entity", value: entity },
+        { label: "Department", value: entity },
+        { label: "Project Cost (A)", value: formatINR(cost.a) },
         { label: "1% of total cost (B)", value: formatINR(cost.cess) },
-        { label: "99% of B", value: formatINR(cost.payable) },
       ],
     });
     go("/checkout");
@@ -80,7 +80,7 @@ export default function EntitySelect() {
 
       <div className="sticky-cta">
         <button className="btn" disabled={submitted && !valid} onClick={proceed}>
-          Proceed to Pay{cost.a > 0 ? ` ${formatINR(cost.a)}` : ""}
+          Proceed to Pay{cost.payable > 0 ? ` ${formatINR(cost.payable)}` : ""}
         </button>
       </div>
     </div>

@@ -11,11 +11,10 @@ export default function DeptForm() {
   const [v, setV] = useState(
     () =>
       drafts.dept || {
+        entity: "",
         name: "",
-        surname: "",
         mobile: "",
         idno: "",
-        entity: "",
         amount: "",
       }
   );
@@ -24,11 +23,10 @@ export default function DeptForm() {
   const cost = computeCost(v.amount);
 
   const errors = {
+    entity: !v.entity ? "Please select a department" : "",
     name: !v.name.trim() ? "Please enter your name" : "",
-    surname: !v.surname.trim() ? "Please enter your surname" : "",
     mobile: !/^\d{10}$/.test(v.mobile) ? "Enter a valid 10-digit mobile number" : "",
     idno: !v.idno.trim() ? "Please enter your ID" : "",
-    entity: !v.entity ? "Please select an entity" : "",
     amount: !(cost.a > 0) ? "Enter the project cost" : "",
   };
   const valid = Object.values(errors).every((e) => !e);
@@ -40,14 +38,14 @@ export default function DeptForm() {
     saveDraft("dept", v);
     setOrder({
       merchantName: v.entity,
-      amount: cost.a,
+      amount: cost.payable,
       details: [
-        { label: "Name", value: `${v.name} ${v.surname}`.trim() },
+        { label: "Department", value: v.entity },
+        { label: "Name", value: v.name },
         { label: "Mobile", value: v.mobile },
         { label: "ID", value: v.idno },
-        { label: "Entity", value: v.entity },
+        { label: "Project Cost (A)", value: formatINR(cost.a) },
         { label: "1% of total cost (B)", value: formatINR(cost.cess) },
-        { label: "99% of B", value: formatINR(cost.payable) },
       ],
     });
     go("/checkout");
@@ -55,26 +53,28 @@ export default function DeptForm() {
 
   return (
     <main className="web-main">
-      <button className="web-back" onClick={() => go("/")}>
-        ← Back to services
+      <button className="web-back" onClick={() => go(-1)}>
+        ← Back
       </button>
       <h1 className="web-title">Punjab Labour Department</h1>
       <p className="web-subtitle">Enter your details to proceed with the payment.</p>
 
       <div className="web-grid">
         <div className="web-card">
+          <SelectField
+            label="Department"
+            placeholder="Select Department"
+            value={v.entity}
+            onChange={(e) => set("entity", e.target.value)}
+            error={err("entity")}
+            options={ENTITIES}
+          />
           <div className="web-fields">
             <TextField
               label="Name"
               value={v.name}
               onChange={(e) => set("name", e.target.value)}
               error={err("name")}
-            />
-            <TextField
-              label="Surname"
-              value={v.surname}
-              onChange={(e) => set("surname", e.target.value)}
-              error={err("surname")}
             />
             <TextField
               label="Mobile Number"
@@ -90,14 +90,6 @@ export default function DeptForm() {
               error={err("idno")}
             />
           </div>
-          <SelectField
-            label="Entity"
-            placeholder="Select Entity"
-            value={v.entity}
-            onChange={(e) => set("entity", e.target.value)}
-            error={err("entity")}
-            options={ENTITIES}
-          />
           <CostCalculator
             value={v.amount}
             onChange={(e) => set("amount", e.target.value.replace(/[^\d.]/g, ""))}
@@ -109,27 +101,27 @@ export default function DeptForm() {
           <div className="web-card web-summary">
             <h3 className="web-summary-title">Payment summary</h3>
             <div className="web-summary-row">
-              <span>Entity</span>
+              <span>Department</span>
               <span>{v.entity || "—"}</span>
+            </div>
+            <div className="web-summary-row">
+              <span>Project Cost (A)</span>
+              <span>{cost.a > 0 ? formatINR(cost.a) : "—"}</span>
             </div>
             <div className="web-summary-row">
               <span>1% of total cost (B)</span>
               <span>{cost.a > 0 ? formatINR(cost.cess) : "—"}</span>
             </div>
-            <div className="web-summary-row">
-              <span>99% of B</span>
-              <span>{cost.a > 0 ? formatINR(cost.payable) : "—"}</span>
-            </div>
             <div className="web-summary-row total">
-              <span>Total payable</span>
-              <span>{cost.a > 0 ? formatINR(cost.a) : "—"}</span>
+              <span>Net cess payable</span>
+              <span>{cost.payable > 0 ? formatINR(cost.payable) : "—"}</span>
             </div>
             <button
               className="btn"
               disabled={submitted && !valid}
               onClick={proceed}
             >
-              Proceed to Pay{cost.a > 0 ? ` ${formatINR(cost.a)}` : ""}
+              Proceed to Pay{cost.payable > 0 ? ` ${formatINR(cost.payable)}` : ""}
             </button>
           </div>
         </aside>

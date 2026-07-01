@@ -172,14 +172,6 @@ export default function Checkout() {
           </div>
 
           <div className="order-summary">
-            <div className="os-row">
-              <span>Amount</span>
-              <span>{formatINR(order.amount)}</span>
-            </div>
-            <div className="os-row">
-              <span>Convenience fee</span>
-              <span>₹0.00</span>
-            </div>
             <div className="os-row total">
               <span>Total payable</span>
               <span>{formatINR(order.amount)}</span>

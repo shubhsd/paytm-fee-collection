@@ -11,11 +11,10 @@ export default function DeptForm() {
   const [v, setV] = useState(
     () =>
       drafts.dept || {
+        entity: "",
         name: "",
-        surname: "",
         mobile: "",
         idno: "",
-        entity: "",
         amount: "",
       }
   );
@@ -24,11 +23,10 @@ export default function DeptForm() {
   const cost = computeCost(v.amount);
 
   const errors = {
+    entity: !v.entity ? "Please select a department" : "",
     name: !v.name.trim() ? "Please enter your name" : "",
-    surname: !v.surname.trim() ? "Please enter your surname" : "",
     mobile: !/^\d{10}$/.test(v.mobile) ? "Enter a valid 10-digit mobile number" : "",
     idno: !v.idno.trim() ? "Please enter your ID" : "",
-    entity: !v.entity ? "Please select an entity" : "",
     amount: !(cost.a > 0) ? "Enter the project cost" : "",
   };
   const valid = Object.values(errors).every((e) => !e);
@@ -40,14 +38,14 @@ export default function DeptForm() {
     saveDraft("dept", v);
     setOrder({
       merchantName: v.entity,
-      amount: cost.a,
+      amount: cost.payable,
       details: [
-        { label: "Name", value: `${v.name} ${v.surname}`.trim() },
+        { label: "Department", value: v.entity },
+        { label: "Name", value: v.name },
         { label: "Mobile", value: v.mobile },
         { label: "ID", value: v.idno },
-        { label: "Entity", value: v.entity },
+        { label: "Project Cost (A)", value: formatINR(cost.a) },
         { label: "1% of total cost (B)", value: formatINR(cost.cess) },
-        { label: "99% of B", value: formatINR(cost.payable) },
       ],
     });
     go("/checkout");
@@ -66,6 +64,26 @@ export default function DeptForm() {
           <h2 className="form-title">Enter your details</h2>
 
           <div className="field">
+            <div className={`field-box select-box ${err("entity") ? "invalid" : ""}`}>
+              <select
+                className={v.entity ? "" : "placeholder"}
+                value={v.entity}
+                onChange={(e) => set("entity", e.target.value)}
+              >
+                <option value="" disabled>
+                  Select Department*
+                </option>
+                {ENTITIES.map((e) => (
+                  <option key={e} value={e}>
+                    {e}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {err("entity") && <p className="field-error">{err("entity")}</p>}
+          </div>
+
+          <div className="field">
             <div className={`field-box ${err("name") ? "invalid" : ""}`}>
               <input
                 placeholder="Name*"
@@ -74,17 +92,6 @@ export default function DeptForm() {
               />
             </div>
             {err("name") && <p className="field-error">{err("name")}</p>}
-          </div>
-
-          <div className="field">
-            <div className={`field-box ${err("surname") ? "invalid" : ""}`}>
-              <input
-                placeholder="Surname*"
-                value={v.surname}
-                onChange={(e) => set("surname", e.target.value)}
-              />
-            </div>
-            {err("surname") && <p className="field-error">{err("surname")}</p>}
           </div>
 
           <div className="field">
@@ -112,26 +119,6 @@ export default function DeptForm() {
             {err("idno") && <p className="field-error">{err("idno")}</p>}
           </div>
 
-          <div className="field">
-            <div className={`field-box select-box ${err("entity") ? "invalid" : ""}`}>
-              <select
-                className={v.entity ? "" : "placeholder"}
-                value={v.entity}
-                onChange={(e) => set("entity", e.target.value)}
-              >
-                <option value="" disabled>
-                  Select Entity*
-                </option>
-                {ENTITIES.map((e) => (
-                  <option key={e} value={e}>
-                    {e}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {err("entity") && <p className="field-error">{err("entity")}</p>}
-          </div>
-
           <CostCalculator
             value={v.amount}
             onChange={(e) => set("amount", e.target.value.replace(/[^\d.]/g, ""))}
@@ -144,7 +131,7 @@ export default function DeptForm() {
 
       <div className="sticky-cta">
         <button className="btn" disabled={submitted && !valid} onClick={proceed}>
-          Proceed to Pay{cost.a > 0 ? ` ${formatINR(cost.a)}` : ""}
+          Proceed to Pay{cost.payable > 0 ? ` ${formatINR(cost.payable)}` : ""}
         </button>
       </div>
     </div>

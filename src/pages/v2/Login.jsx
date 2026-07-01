@@ -25,8 +25,8 @@ export default function Login() {
 
   return (
     <main className="web-main web-main-narrow">
-      <button className="web-back" onClick={() => go("/")}>
-        ← Back to services
+      <button className="web-back" onClick={() => go(-1)}>
+        ← Back
       </button>
       <h1 className="web-title">Log in to continue</h1>
       <p className="web-subtitle">

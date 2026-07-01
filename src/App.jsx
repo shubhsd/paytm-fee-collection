@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import VersionLanding from "./pages/VersionLanding";
 
 // ---- Version 1: mobile phone-frame preview ----
@@ -61,13 +62,25 @@ function V2App() {
   );
 }
 
+// Scroll to the top of the page on every route change (incl. back navigation).
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<VersionLanding />} />
-      <Route path="/v1/*" element={<V1App />} />
-      <Route path="/v2/*" element={<V2App />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<VersionLanding />} />
+        <Route path="/v1/*" element={<V1App />} />
+        <Route path="/v2/*" element={<V2App />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   );
 }

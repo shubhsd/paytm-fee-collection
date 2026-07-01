@@ -23,11 +23,11 @@ export default function EntitySelect() {
     saveDraft("entity", { entity, amountStr });
     setOrder({
       merchantName: entity,
-      amount: cost.a,
+      amount: cost.payable,
       details: [
-        { label: "Entity", value: entity },
+        { label: "Department", value: entity },
+        { label: "Project Cost (A)", value: formatINR(cost.a) },
         { label: "1% of total cost (B)", value: formatINR(cost.cess) },
-        { label: "99% of B", value: formatINR(cost.payable) },
       ],
     });
     go("/checkout");
@@ -35,8 +35,8 @@ export default function EntitySelect() {
 
   return (
     <main className="web-main">
-      <button className="web-back" onClick={() => go("/")}>
-        ← Back to services
+      <button className="web-back" onClick={() => go(-1)}>
+        ← Back
       </button>
       <h1 className="web-title">Select entity &amp; amount</h1>
       <p className="web-subtitle">Choose the entity you want to pay and the amount.</p>
@@ -66,23 +66,23 @@ export default function EntitySelect() {
               <span>{entity || "—"}</span>
             </div>
             <div className="web-summary-row">
+              <span>Project Cost (A)</span>
+              <span>{cost.a > 0 ? formatINR(cost.a) : "—"}</span>
+            </div>
+            <div className="web-summary-row">
               <span>1% of total cost (B)</span>
               <span>{cost.a > 0 ? formatINR(cost.cess) : "—"}</span>
             </div>
-            <div className="web-summary-row">
-              <span>99% of B</span>
-              <span>{cost.a > 0 ? formatINR(cost.payable) : "—"}</span>
-            </div>
             <div className="web-summary-row total">
-              <span>Total payable</span>
-              <span>{cost.a > 0 ? formatINR(cost.a) : "—"}</span>
+              <span>Net cess payable</span>
+              <span>{cost.payable > 0 ? formatINR(cost.payable) : "—"}</span>
             </div>
             <button
               className="btn"
               disabled={submitted && !valid}
               onClick={proceed}
             >
-              Proceed to Pay{cost.a > 0 ? ` ${formatINR(cost.a)}` : ""}
+              Proceed to Pay{cost.payable > 0 ? ` ${formatINR(cost.payable)}` : ""}
             </button>
           </div>
         </aside>
